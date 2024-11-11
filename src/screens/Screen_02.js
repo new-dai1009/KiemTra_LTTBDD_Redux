@@ -2,11 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import axios from 'axios';
 
-const Screen_02 = () => {
+const Screen_02 = ({ navigation }) => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedType, setSelectedType] = useState('ALL'); 
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -24,20 +23,14 @@ const Screen_02 = () => {
     fetchProducts();
   }, []);
 
-  const filterProducts = (type) => {
-    setSelectedType(type); 
-    if (type === 'ALL') {
-      setFilteredProducts(products); 
-    } else {
-      const filtered = products.filter(product => product.type === type);
-      setFilteredProducts(filtered);
-    }
+  const handleProductPress = (product) => {
+    navigation.navigate('Screen_03', { product });
   };
 
   if (loading) {
     return (
       <View style={styles.center}>
-        <Text>Loading...</Text>
+        <Text style={styles.loadingText}>Loading...</Text>
       </View>
     );
   }
@@ -45,52 +38,19 @@ const Screen_02 = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.textHeader}>The World’s Best Bike</Text>
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          onPress={() => filterProducts('ALL')}
-          style={[
-            styles.button,
-            selectedType === 'ALL' && styles.selectedButton 
-          ]}
-        >
-          <Text style={selectedType === 'ALL' ? styles.selectedButtonText : styles.buttonText}>
-            ALL
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => filterProducts('Roadbike')}
-          style={[
-            styles.button,
-            selectedType === 'Roadbike' && styles.selectedButton 
-          ]}
-        >
-          <Text style={selectedType === 'Roadbike' ? styles.selectedButtonText : styles.buttonText}>
-            Roadbike
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => filterProducts('Mountain')}
-          style={[
-            styles.button,
-            selectedType === 'Mountain' && styles.selectedButton 
-          ]}
-        >
-          <Text style={selectedType === 'Mountain' ? styles.selectedButtonText : styles.buttonText}>
-            Mountain
-          </Text>
-        </TouchableOpacity>
-      </View>
       <FlatList
         data={filteredProducts}
         keyExtractor={(item) => item.id.toString()}
         numColumns={2}
         renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Image source={{ uri: item.img }} style={styles.image} />
-            <Text style={styles.name}>{item.name}</Text>
-            <Text style={styles.price}>${item.price}</Text>
-            <Text style={styles.description}>{item.description}</Text>
-          </View>
+          <TouchableOpacity onPress={() => handleProductPress(item)}>
+            <View style={styles.card}>
+              <Image source={{ uri: item.img }} style={styles.image} />
+              <Text style={styles.name}>{item.name}</Text>
+              <Text style={styles.price}>${item.price}</Text>
+              <Text style={styles.description}>{item.description}</Text>
+            </View>
+          </TouchableOpacity>
         )}
       />
     </View>
@@ -148,32 +108,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  loadingText: {
+    fontSize: 18,
+    color: '#555',
+  },
   textHeader: {
     fontSize: 20,
-    color: 'red',
+    color: '#FF6347',
     textAlign: 'center',
     marginBottom: 16,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginBottom: 16,
-  },
-  button: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    backgroundColor: '#eee',
-    borderRadius: 8,
-  },
-  selectedButton: {
-    backgroundColor: '#ff5733', 
-  },
-  buttonText: {
-    fontSize: 16,
-    color: '#333',
-  },
-  selectedButtonText: {
-    color: '#fff', 
   },
 });
 
